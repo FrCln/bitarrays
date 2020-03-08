@@ -26,14 +26,23 @@ for entity in (a, b):
         j = entity[i]
     print(entity.__class__.__name__, process_time() - start)
 
+print('Appending')
+a = BitArray()
+b = []
+for entity in (a, b):
+    start = process_time()
+    for i in range(LEN):
+        entity.append(0)
+    print(entity.__class__.__name__, process_time() - start)
+
+print()
+print('BitArray faster than list')
 print('Count')
 for entity in (a, b):
     start = process_time()
     j = entity.count(1)
     print(entity.__class__.__name__, process_time() - start)
 
-print()
-print('BitArray faster than list')
 print('Inverting')
 start = process_time()
 a = ~a
@@ -51,7 +60,7 @@ start = process_time()
 cipher = [random.randint(0, 1) for i in range(LEN)]
 print('list', process_time() - start)
 
-print('Encrypting')
+print('Binary XOR')
 start = process_time()
 a = a ^ b_cipher
 print('BitArray', process_time() - start)

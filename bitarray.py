@@ -35,7 +35,7 @@ class BitArray:
         else:
             raise TypeError(
                 f'init_value for BitArray must be iterable or int or string '
-                'in binary format, not {init_value.__class__.__name__}'
+                f'in binary format, not {init_value.__class__.__name__}'
             )
 
         if self.length < self._int.bit_length():
@@ -101,16 +101,7 @@ class BitArray:
         return BitArray(invert_value, self.length)
 
     def __iter__(self):
-        self._index = 0
-        self._val = self._int << 1
-        return self
-
-    def __next__(self):
-        if self._index >= self.length:
-            raise StopIteration
-        self._index += 1
-        self._val >>= 1
-        return self._val & 1
+        return map(int, self.binstr)
 
     def __or__(self, other):
         if isinstance(other, BitArray):
@@ -298,13 +289,8 @@ class BitArray:
         return cls(val, length)
 
     def count(self, value=1):
-        res = 0
-        val = self._int
-        test = 0 if value else 1
-        for i in range(self.length):
-            res += val & 1 ^ test
-            val >>= 1
-        return res
+        value = '1' if value else '0'
+        return self.binstr.count(value)
 
     @staticmethod
     def encrypt(msg: str):
@@ -326,4 +312,8 @@ class BitArray:
         res = bin(self._int)[:1:-1]
         res += '0' * (len(self) - len(res))
         return res
+
+    @property
+    def int_value(self):
+        return self._int
 
