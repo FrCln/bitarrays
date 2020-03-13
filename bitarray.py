@@ -5,6 +5,7 @@ import sys
 
 
 class BitArray:
+
     def __init__(self, init_value=0, length=None):
 
         if isinstance(init_value, int):
@@ -19,7 +20,8 @@ class BitArray:
             self.length = length or len(init_value)
 
         elif isinstance(init_value, (bytes, bytearray)):
-            self.from_bytes(init_value, length)
+            self._int = int.from_bytes(init_value, 'little')
+            self.length = length or len(init_value) * 8
 
         elif isinstance(init_value, BitArray):
             self._int = init_value._int
@@ -204,11 +206,11 @@ class BitArray:
         self._int |= bool(item) << self.length
         self.length += 1
 
-    def to_bytes(self, byteorder=sys.byteorder):
+    def to_bytes(self, byteorder='little'):
         return self._int.to_bytes((self.length + 7) // 8, byteorder)
 
     @classmethod
-    def from_bytes(cls, byteobject, length=None, byteorder=sys.byteorder):
+    def from_bytes(cls, byteobject, length=None, byteorder='little'):
         if not isinstance(byteobject, (bytes, bytearray)):
             raise TypeError(
                 f'bytes or bytearray object required for method from_bytes, '
@@ -218,12 +220,14 @@ class BitArray:
         length = length or len(byteobject) * 8
         return cls(_int, length)
 
-    def to_file(self, file, byteorder=sys.byteorder):
-        file.write(self.to_bytes(byteorder))
+    def to_file(self, filename, byteorder='little'):
+        with open(filename, 'wb') as file:
+            file.write(self.to_bytes(byteorder))
 
     @classmethod
-    def from_file(cls, file, length=None, byteorder=sys.byteorder):
-        return cls.from_bytes(file.read(), length, byteorder)
+    def from_file(cls, filename, length=None, byteorder='little'):
+        with open(filename, 'rb') as file:
+            return cls.from_bytes(file.read(), length, byteorder)
 
     def set_all(self, value=True):
         if value:
@@ -285,7 +289,7 @@ class BitArray:
 
     @classmethod
     def random(cls, length):
-        val = int.from_bytes(token_bytes((length + 7) // 8), sys.byteorder)
+        val = int.from_bytes(token_bytes((length + 7) // 8), 'little')
         return cls(val, length)
 
     def count(self, value=1):

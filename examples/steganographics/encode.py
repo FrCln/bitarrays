@@ -11,8 +11,7 @@ img = Image.open('test.bmp')
 im_array = np.array(img)
 
 # Загружаем данные в BitArray
-with open('test.txt', 'rb') as f:
-    tmp = BitArray.from_file(f)
+tmp = BitArray.from_file('test.txt')
 
 # Определяем длину сообщения и запсываем ее в первые 4 байта
 tmp_len = BitArray(len(tmp), length=32)

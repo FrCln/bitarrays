@@ -23,5 +23,4 @@ data &= 1
 # Преобразовываем в BitArray
 decoded = BitArray(data)
 # Сохраняем в файл
-with open('out.txt', 'wb') as f:
-    decoded.to_file(f)
+decoded.to_file('out.txt')
