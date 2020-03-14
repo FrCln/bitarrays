@@ -9,6 +9,8 @@ class BitArray:
     def __init__(self, init_value=0, length=None):
 
         if isinstance(init_value, int):
+            if init_value < 0:
+                raise ValueError('cannot initialize BitArray with negative value')
             self._int = init_value
             self.length = length or init_value.bit_length()
 

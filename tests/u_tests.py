@@ -45,6 +45,9 @@ class TestBitArray(unittest.TestCase):
         with self.assertRaises(ValueError):
             BitArray('012')
 
+        with self.assertRaises(ValueError):
+            BitArray(-1)
+
         with self.assertRaises(TypeError):
             BitArray(self)
 
