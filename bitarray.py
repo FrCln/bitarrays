@@ -6,19 +6,25 @@ import sys
 
 class BitArray:
 
-    def __init__(self, init_value=0, length=None):
+    def __init__(self, init_value=None, length=None):
 
         if isinstance(init_value, int):
             if init_value < 0:
                 raise ValueError('cannot initialize BitArray with negative value')
             self._int = init_value
-            self.length = length or init_value.bit_length()
+            if init_value != 0:
+                self.length = length or init_value.bit_length()
+            else:
+                self.length = length or 1
 
         elif isinstance(init_value, str):
-            try:
-                self._int = int(init_value[::-1], 2)
-            except ValueError as ex:
-                raise ValueError("str for BitArray must contain only '0' and '1'")
+            if not init_value:
+                self._int = 0
+            else:
+                try:
+                    self._int = int(init_value[::-1], 2)
+                except ValueError as ex:
+                    raise ValueError("str for BitArray must contain only '0' and '1'")
             self.length = length or len(init_value)
 
         elif isinstance(init_value, (bytes, bytearray)):
@@ -35,6 +41,10 @@ class BitArray:
                 if a:
                     self._int |= 1 << i
             self.length = length or len(init_value)
+
+        elif init_value is None:
+            self._int = 0
+            self.length = length or 0
 
         else:
             raise TypeError(
@@ -89,7 +99,7 @@ class BitArray:
             )
 
     def __bool__(self):
-        return bool(self._int)
+        return self.length > 0
 
     def __eq__(self, other):
         if isinstance(other, BitArray):

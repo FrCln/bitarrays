@@ -15,9 +15,10 @@ class TestBitArray(unittest.TestCase):
             (('111', 15), (7, 15)),
             (('1110',), (7, 4)),
             (('0111',), (14,)),
-            (('0',), (0, 1)),
+            (('0',), (0,)),
             (('000',), (0, 3)),
-            (([],), (0,)),
+            (('',), ()),
+            (([],), ()),
             (([0],), (0, 1)),
             (([False],), (0, 1)),
             (([''],), (0, 1)),
@@ -37,7 +38,7 @@ class TestBitArray(unittest.TestCase):
         ]
         for values, params in test_values:
             with self.subTest():
-                self.assertEqual(BitArray(*values), BitArray(*params), str(values))
+                self.assertEqual(BitArray(*values), BitArray(*params), str(values) + str(params))
 
         with self.subTest():
             self.assertEqual(BitArray(self.ba), self.ba)
@@ -51,10 +52,25 @@ class TestBitArray(unittest.TestCase):
         with self.assertRaises(TypeError):
             BitArray(self)
 
-    @unittest.skip("not now")
     def test_read_from_file(self):
         a = BitArray.from_file('test_file.bin')
         self.assertEqual(a, BitArray(ord('0'), 8))
+
+    def test_len(self):
+        test_values = [
+            ('111', 3),
+            ('000', 3),
+            ([False, True, False], 3),
+            ('', 0),
+            ([], 0),
+            ('0' * 1024, 1024)
+        ]
+        for value, lenght in test_values:
+            with self.subTest():
+                self.assertEqual(len(BitArray(value)), lenght, str(value))
+
+    def test_add(self):
+        self.assertEqual(BitArray('011') + BitArray('101'), BitArray('011101'))
 
     # @unittest.expectedFailure
     # def test_fail(self):
