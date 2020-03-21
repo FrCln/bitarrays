@@ -259,7 +259,7 @@ class BitArray:
         self._check_dict(code_dict)
         rev_dict = {v: k for k, v in sorted(code_dict.items(), key=lambda x: x[1])}
         max_code_len = max(map(len, rev_dict.keys()))
-        temp_str = f'{self._int:0{self.length}b}'[::-1]
+        temp_str = self.binstr
         i = 1
         res = ''
         while i <= len(temp_str):
