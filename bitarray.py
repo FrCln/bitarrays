@@ -259,20 +259,19 @@ class BitArray:
         self._check_dict(code_dict)
         rev_dict = {v: k for k, v in sorted(code_dict.items(), key=lambda x: x[1])}
         max_code_len = max(map(len, rev_dict.keys()))
-        temp_str = self.binstr
-        i = 1
+        temp_str = ''
         res = ''
-        while i <= len(temp_str):
-            if temp_str[:i] in rev_dict:
-                res += rev_dict[temp_str[:i]]
-                temp_str = temp_str[i:]
-                i = 1
-            else:
-                i += 1
-                if i > max_code_len:
-                    raise ValueError(f"cannot resolve code '{temp_str[:i]}'")
+
+        for c in self.binstr:
+            temp_str += c
+            if temp_str in rev_dict:
+                res += rev_dict[temp_str]
+                temp_str = ''
+            elif len(temp_str) > max_code_len:
+                raise ValueError(f"cannot resolve code '{temp_str}'")
         if len(temp_str) > 0:
             raise ValueError(f"cannot resolve code '{temp_str}'")
+
         return res
 
     @staticmethod
