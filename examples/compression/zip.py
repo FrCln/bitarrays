@@ -7,46 +7,34 @@ sys.path.append('../../')
 from bitarray import BitArray
 
 
-def generate_bit_codes(length, value=''):
-    if not length:
-        yield value
+def make_huffman_tree(text):
+    letters = [(count, letter) for letter, count in Counter(text).items()]
+
+    while len(letters) > 1:
+        letters.sort(key=lambda it: it[0])
+        f1, l1 = letters.pop(0)
+        f2, l2 = letters.pop(0)
+        letters.append((f1 + f2, (l1, l2)))
+
+    return letters[0][1]
+
+
+def make_huffman_code(tree_element):
+    if len(tree_element) == 1:
+        return {tree_element: ''}
     else:
-        for c in '01':
-            yield from generate_bit_codes(length - 1, value + c)
+        code = {}
+        for letter, c in make_huffman_code(tree_element[0]).items():
+            code[letter] = '0' + c
+        for letter, c in make_huffman_code(tree_element[1]).items():
+            code[letter] = '1' + c
+    return code
 
 
 test_string = open('test.txt').read()
+tree = make_huffman_tree(test_string)
+code = make_huffman_code(tree)
 
-cnt = Counter(test_string)
-
-new_len = ceil(log2(len(cnt))) * len(test_string)
-
-val = sorted(cnt.items(), key=lambda x: x[1])
-cmpr = []
-
-while val:
-    prev_len = new_len
-    cmpr.append(val.pop())
-    compr_len = sum(cmpr[i][1] * (i + 1) for i in range(len(cmpr)))
-    if val:
-        add_len = (ceil(log2(len(val))) + len(cmpr)) * (len(test_string) - sum(cnt[x[0]] for x in cmpr))
-    else:
-        add_len = 0
-    new_len = compr_len + add_len
-    if new_len >= prev_len:
-        cmpr.pop()
-        break
-
-code = {}
-for i, (symbol, _) in enumerate(cmpr):
-    code[symbol] = '1'*i + '0'
-    cnt.pop(symbol)
-
-gen = generate_bit_codes(ceil(log2(len(cnt) + 1)))
-for symbol in cnt:
-    code[symbol] = '1' + next(gen)
-
-data = BitArray.from_bytes(pickle.dumps(code))
-data = BitArray(len(data), 32) + data + BitArray.encode(code, test_string)
+pickled_code = BitArray.from_bytes(pickle.dumps(code))
+data = BitArray(len(pickled_code), 32) + pickled_code + BitArray.encode(code, test_string)
 data.to_file('test.bin')
-
